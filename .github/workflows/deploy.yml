@@ -6,18 +6,24 @@ on:
       - main
 
 jobs:
-  ssh-test:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: SSH Test Only
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Build Docker image
+      run: docker build -t myapp .
+
+    - name: Deploy to EC2
       uses: appleboy/ssh-action@v1
       with:
         host: ${{ secrets.EC2_HOST }}
-        username: ubuntu
+        username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_KEY }}
-        port: 22
         script: |
-          echo "CONNECTED SUCCESSFULLY"
-          whoami
-          hostname
+          docker stop myapp || true
+          docker rm myapp || true
+          docker build -t myapp .
+          docker run -d -p 80:80 --name myapp myapp
