@@ -27,3 +27,18 @@ jobs:
           docker rm myapp || true
           docker build -t myapp .
           docker run -d -p 80:80 --name myapp myapp
+
+
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@v1
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_KEY }}
+        script: |
+          echo "CONNECTED SUCCESSFULLY"
+          whoami
+
+
+     
+
